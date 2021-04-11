@@ -5,16 +5,14 @@ const config = require('../config');
 async function getTodos(page = 1){
   const offset = helper.getOffset(page, config.listPerPage);
   const rows = await db.query(
-    `SELECT id, title, description, completed 
+    `SELECT id, title, description, completed, createdAt as created
     FROM todos LIMIT ?,?`, 
     [offset, config.listPerPage]
   );
   const data = helper.emptyOrRows(rows);
-  const meta = {page};
 
   return {
-    data,
-    meta
+    data
   }
 }
 
@@ -32,20 +30,22 @@ async function getTodo(todoId){
 }
 
 async function create(todoElement){
+  let date = getDate();
+
   const result = await db.query(
     `INSERT INTO todos 
-    (title, description) 
+    (title, description, createdAt, updatedAt) 
     VALUES 
-    (?, ?)`, 
+    (?, ?, ?, ?)`, 
     [
-      todoElement.title, todoElement.description
+      todoElement.title, todoElement.description, date, date
     ]
   );
 
-  let message = 'Error in creating programming language';
+  let message = 'Error in creating Task';
 
   if (result.affectedRows) {
-    message = 'Programming language created successfully';
+    message = 'Task created successfully';
   }
 
   return {message};
@@ -61,16 +61,18 @@ async function update(id, todoElement){
     ]
   );
 
-  let message = 'Error in updating programming language';
+  let message = 'Error in updating task';
 
   if (result.affectedRows) {
-    message = 'Programming language updated successfully';
+    message = 'Task updated successfully';
   }
 
   return {message};
 }
 
 async function updateStatus(id, todoElement){
+  console.log("UPDATE>", todoElement)
+  console.log("ID>", id)
   const result = await db.query(
     `UPDATE todos 
     SET completed=?
@@ -80,10 +82,10 @@ async function updateStatus(id, todoElement){
     ]
   );
 
-  let message = 'Error in updating programming language';
+  let message = 'Error in updating task';
 
   if (result.affectedRows) {
-    message = 'Programming language updated successfully';
+    message = 'Task updated successfully';
   }
 
   return {message};
@@ -95,13 +97,22 @@ async function remove(id){
     [id]
   );
 
-  let message = 'Error in deleting programming language';
+  let message = 'Error in deleting task';
 
   if (result.affectedRows) {
-    message = 'Programming language deleted successfully';
+    message = 'Task deleted successfully';
   }
 
   return {message};
+}
+
+function getDate() {
+  var today = new Date();
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0');
+  var yyyy = today.getFullYear();
+  today = yyyy + '/' + mm + '/' + dd + ' 00:00:00';
+  return today;
 }
 
 module.exports = {
