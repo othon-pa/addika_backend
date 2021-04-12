@@ -52,7 +52,6 @@ router.patch('/todos/:id', async function(req, res, next) {
 });
 
 router.delete('/todos/:id', async function(req, res, next) {
-    console.log("delete>", req.params.id)
     try {
         res.json(await todosTable.remove(req.params.id));
     } catch (err) {

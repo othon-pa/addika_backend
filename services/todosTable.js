@@ -54,10 +54,10 @@ async function create(todoElement){
 async function update(id, todoElement){
   const result = await db.query(
     `UPDATE todos 
-    SET name=?, description=?
+    SET title=?, description=?
     WHERE id=?`, 
     [
-      todoElement.name, todoElement.description, id
+      todoElement.title, todoElement.description, id
     ]
   );
 
@@ -71,8 +71,6 @@ async function update(id, todoElement){
 }
 
 async function updateStatus(id, todoElement){
-  console.log("UPDATE>", todoElement)
-  console.log("ID>", id)
   const result = await db.query(
     `UPDATE todos 
     SET completed=?
